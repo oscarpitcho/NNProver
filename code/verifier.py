@@ -124,10 +124,9 @@ def analyze(
 
     is_verified = verify_bounds(ver_lb, true_label)
 
-    if is_verified:
-        return is_verified
-
     return is_verified
+
+
 def main():
     start = time()
 

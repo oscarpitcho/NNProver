@@ -169,7 +169,6 @@ class LinearTransformer(torch.nn.Module):
         i.e alternatively n_constraints, n_vars
         """
 
-        #TODO: Check if we can replace by one argument and use the same for both upper and lower bounds
         # Pattern match in deeppoly function
         self.uc = layer.weight
         self.uc_b = layer.bias
@@ -225,7 +224,7 @@ class LinearTransformer(torch.nn.Module):
     def do_backsub(uc : torch.Tensor, uc_b : torch.Tensor, 
                    lc : torch.Tensor, lc_b: torch.Tensor, 
                    layer_constraints : torch.Tensor, layer_constraints_b : torch.Tensor):
-            """Used for testing puposes"""
+            """Used for testing and modularity puposes"""
 
             new_uc = torch.matmul(uc, layer_constraints) 
             new_uc_b = torch.matmul(uc, layer_constraints_b) + uc_b
@@ -309,6 +308,9 @@ class ConvTransformer(torch.nn.Module):
         assert self.constraints_b.shape == (self.n_constraints,)
     
     def build_weight_matrix(self):
+
+        """Transforms a convolutional layer into an equivalent linear layer."""
+
         width_with_padding = self.input_width + 2 * self.padding
         height_with_padding = self.input_height + 2 * self.padding
         spatial_dim_with_padding = height_with_padding * width_with_padding
@@ -454,7 +456,7 @@ class ReLuTransformer(torch.nn.Module):
         assert self.lb.shape[-1] == self.input_size, f"Lower bounds shape is not correct: {self.lb.shape}, {self.input_size}"
         assert self.ub.shape[-1] == self.input_size, f"Upper bounds shape is not correct: {self.ub.shape}"
 
-        beta_ = torch.zeros(self.input_size)
+        #beta_ = torch.zeros(self.input_size)
         lambda_ = self.ub / (self.ub - self.lb)
         mu_ = self.ub - lambda_ * self.ub
         zeros = torch.zeros(self.input_size)
@@ -474,6 +476,8 @@ class ReLuTransformer(torch.nn.Module):
 
         #Note: torch.clamp quickly sets gradient to 0 after which there is no learning 
         beta_bounded = torch.nn.Sigmoid()(self.beta)
+
+
         #beta_bounded = torch.clamp(self.beta, min=0, max=1)
 
         #SET THE LOWER AND UPPER BOUNDS FOR THE DIFFERENT CASES
