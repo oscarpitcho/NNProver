@@ -1,0 +1,210 @@
+2023-12-19 23:12:49,800 - INFO - ---------Running forward test------------
+2023-12-19 23:12:49,800 - DEBUG - Deeppoly verifier - Calling Forward pass layer 0 - LinearTransformer
+2023-12-19 23:12:49,800 - INFO - Linear layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,800 - DEBUG - linear_forward -  upper constraints shape : torch.Size([2, 2]), upper constraints bias : torch.Size([2]), lower constraints shape : torch.Size([2, 2]), lower constraints bias : torch.Size([2])
+2023-12-19 23:12:49,800 - DEBUG - linear_forward -  lower bounds shape : torch.Size([2]), upper bounds shape : torch.Size([2])
+2023-12-19 23:12:49,800 - DEBUG - linear_forward - cl_conc_out first 5 values tensor([-2., -2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - linear_forward - cu_conc_out first 5 values tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - Forward pass for layer 0 done - lb and ub of layer 0 first 5 values lb:tensor([-2., -2.], grad_fn=<SliceBackward0>)  - ub:tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - Forward pass for layer 0 done - layer.lb address: 0x22de7209df0, layer.ub address: 0x22de720a2a0
+2023-12-19 23:12:49,800 - DEBUG - Deeppoly verifier - Calling Forward pass layer 1 - ReLuTransformer
+2023-12-19 23:12:49,800 - INFO - ReLU layer propagation... ReLU()
+2023-12-19 23:12:49,800 - DEBUG - relu_forward - cl_conc first 5 values tensor([0., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - relu_forward - cu_conc first 5 values tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - Forward pass for layer 1 done - lb and ub of layer 1 first 5 values lb:tensor([0., 0.], grad_fn=<SliceBackward0>)  - ub:tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - Forward pass for layer 1 done - layer.lb address: 0x22de6e9fa60, layer.ub address: 0x22de6e9f470
+2023-12-19 23:12:49,800 - DEBUG - Deeppoly verifier - Calling Forward pass layer 2 - LinearTransformer
+2023-12-19 23:12:49,800 - INFO - Linear layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,800 - DEBUG - linear_forward -  upper constraints shape : torch.Size([2, 2]), upper constraints bias : torch.Size([2]), lower constraints shape : torch.Size([2, 2]), lower constraints bias : torch.Size([2])
+2023-12-19 23:12:49,800 - DEBUG - linear_forward -  lower bounds shape : torch.Size([2]), upper bounds shape : torch.Size([2])
+2023-12-19 23:12:49,800 - DEBUG - linear_forward - cl_conc_out first 5 values tensor([ 0., -2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - linear_forward - cu_conc_out first 5 values tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - Forward pass for layer 2 done - lb and ub of layer 2 first 5 values lb:tensor([ 0., -2.], grad_fn=<SliceBackward0>)  - ub:tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - Forward pass for layer 2 done - layer.lb address: 0x22de75c0d60, layer.ub address: 0x22de6a1fa10
+2023-12-19 23:12:49,800 - DEBUG - Deeppoly verifier - Calling Forward pass layer 3 - ReLuTransformer
+2023-12-19 23:12:49,800 - INFO - ReLU layer propagation... ReLU()
+2023-12-19 23:12:49,800 - DEBUG - relu_forward - cl_conc first 5 values tensor([0., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - relu_forward - cu_conc first 5 values tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - Forward pass for layer 3 done - lb and ub of layer 3 first 5 values lb:tensor([0., 0.], grad_fn=<SliceBackward0>)  - ub:tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,800 - DEBUG - Forward pass for layer 3 done - layer.lb address: 0x22de8effec0, layer.ub address: 0x22de8efff60
+2023-12-19 23:12:49,800 - DEBUG - Deeppoly verifier - Calling Forward pass layer 4 - LinearTransformer
+2023-12-19 23:12:49,800 - INFO - Linear layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,800 - DEBUG - linear_forward -  upper constraints shape : torch.Size([2, 2]), upper constraints bias : torch.Size([2]), lower constraints shape : torch.Size([2, 2]), lower constraints bias : torch.Size([2])
+2023-12-19 23:12:49,800 - DEBUG - linear_forward -  lower bounds shape : torch.Size([2]), upper bounds shape : torch.Size([2])
+2023-12-19 23:12:49,815 - DEBUG - linear_forward - cl_conc_out first 5 values tensor([1., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,817 - DEBUG - linear_forward - cu_conc_out first 5 values tensor([7., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Forward pass for layer 4 done - lb and ub of layer 4 first 5 values lb:tensor([1., 0.], grad_fn=<SliceBackward0>)  - ub:tensor([7., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Forward pass for layer 4 done - layer.lb address: 0x22de8f48360, layer.ub address: 0x22de8f481d0
+2023-12-19 23:12:49,818 - DEBUG - Deeppoly verifier - Calling Forward pass layer 5 - LinearTransformer
+2023-12-19 23:12:49,818 - INFO - Linear layer propagation... Linear(in_features=2, out_features=1, bias=True)
+2023-12-19 23:12:49,818 - DEBUG - linear_forward -  upper constraints shape : torch.Size([1, 2]), upper constraints bias : torch.Size([1]), lower constraints shape : torch.Size([1, 2]), lower constraints bias : torch.Size([1])
+2023-12-19 23:12:49,818 - DEBUG - linear_forward -  lower bounds shape : torch.Size([2]), upper bounds shape : torch.Size([2])
+2023-12-19 23:12:49,818 - DEBUG - linear_forward - cl_conc_out first 5 values tensor([-1.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - linear_forward - cu_conc_out first 5 values tensor([7.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Forward pass for layer 5 done - lb and ub of layer 5 first 5 values lb:tensor([-1.], grad_fn=<SliceBackward0>)  - ub:tensor([7.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Forward pass for layer 5 done - layer.lb address: 0x22de8f486d0, layer.ub address: 0x22de8f48590
+2023-12-19 23:12:49,818 - DEBUG - Forward pass done - Verifier net  : Sequential(
+  (0): LinearTransformer(
+    (layer): Linear(in_features=2, out_features=2, bias=True)
+  )
+  (1): ReLuTransformer(
+    (layer): ReLU()
+  )
+  (2): LinearTransformer(
+    (layer): Linear(in_features=2, out_features=2, bias=True)
+  )
+  (3): ReLuTransformer(
+    (layer): ReLU()
+  )
+  (4): LinearTransformer(
+    (layer): Linear(in_features=2, out_features=2, bias=True)
+  )
+  (5): LinearTransformer(
+    (layer): Linear(in_features=2, out_features=1, bias=True)
+  )
+)
+2023-12-19 23:12:49,818 - DEBUG - -------Concrete bounds state-----------
+2023-12-19 23:12:49,818 - DEBUG - Concrete bounds for layer 0 - LinearTransformer(
+  (layer): Linear(in_features=2, out_features=2, bias=True)
+) - lb: tensor([-2., -2.], grad_fn=<AddBackward0>), ub: tensor([2., 2.], grad_fn=<AddBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Concrete bounds for layer 1 - ReLuTransformer(
+  (layer): ReLU()
+) - lb: tensor([0., 0.], grad_fn=<ReluBackward0>), ub: tensor([2., 2.], grad_fn=<ReluBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Concrete bounds for layer 2 - LinearTransformer(
+  (layer): Linear(in_features=2, out_features=2, bias=True)
+) - lb: tensor([ 0., -2.], grad_fn=<AddBackward0>), ub: tensor([4., 2.], grad_fn=<AddBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Concrete bounds for layer 3 - ReLuTransformer(
+  (layer): ReLU()
+) - lb: tensor([0., 0.], grad_fn=<ReluBackward0>), ub: tensor([4., 2.], grad_fn=<ReluBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Concrete bounds for layer 4 - LinearTransformer(
+  (layer): Linear(in_features=2, out_features=2, bias=True)
+) - lb: tensor([1., 0.], grad_fn=<AddBackward0>), ub: tensor([7., 2.], grad_fn=<AddBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - Concrete bounds for layer 5 - LinearTransformer(
+  (layer): Linear(in_features=2, out_features=1, bias=True)
+) - lb: tensor([-1.], grad_fn=<AddBackward0>), ub: tensor([7.], grad_fn=<AddBackward0>)
+2023-12-19 23:12:49,818 - DEBUG - ---------------End of concrete bounds state---------------
+2023-12-19 23:12:49,838 - INFO - -------Running backsubstitution test----------
+2023-12-19 23:12:49,838 - DEBUG - Deeppoly verifier - Calling Forward pass layer 0 - LinearTransformer
+2023-12-19 23:12:49,838 - INFO - Linear layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,838 - DEBUG - linear_forward -  upper constraints shape : torch.Size([2, 2]), upper constraints bias : torch.Size([2]), lower constraints shape : torch.Size([2, 2]), lower constraints bias : torch.Size([2])
+2023-12-19 23:12:49,838 - DEBUG - linear_forward -  lower bounds shape : torch.Size([2]), upper bounds shape : torch.Size([2])
+2023-12-19 23:12:49,839 - DEBUG - linear_forward - cl_conc_out first 5 values tensor([-2., -2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,840 - DEBUG - linear_forward - cu_conc_out first 5 values tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,840 - DEBUG - Forward pass for layer 0 done - lb and ub of layer 0 first 5 values lb:tensor([-2., -2.], grad_fn=<SliceBackward0>)  - ub:tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,841 - DEBUG - Forward pass for layer 0 done - layer.lb address: 0x22de75fe7f0, layer.ub address: 0x22de720a2a0
+2023-12-19 23:12:49,841 - DEBUG - Deeppoly verifier - Calling Forward pass layer 1 - ReLuTransformer
+2023-12-19 23:12:49,841 - INFO - ReLU layer propagation... ReLU()
+2023-12-19 23:12:49,842 - DEBUG - relu_forward - cl_conc first 5 values tensor([0., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,842 - DEBUG - relu_forward - cu_conc first 5 values tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,842 - DEBUG - Forward pass for layer 1 done - lb and ub of layer 1 first 5 values lb:tensor([0., 0.], grad_fn=<SliceBackward0>)  - ub:tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,844 - DEBUG - Forward pass for layer 1 done - layer.lb address: 0x22de8f48720, layer.ub address: 0x22de8f48040
+2023-12-19 23:12:49,844 - DEBUG - Deeppoly verifier - Calling Forward pass layer 2 - LinearTransformer
+2023-12-19 23:12:49,844 - INFO - Linear layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,844 - DEBUG - linear_forward -  upper constraints shape : torch.Size([2, 2]), upper constraints bias : torch.Size([2]), lower constraints shape : torch.Size([2, 2]), lower constraints bias : torch.Size([2])
+2023-12-19 23:12:49,844 - DEBUG - linear_forward -  lower bounds shape : torch.Size([2]), upper bounds shape : torch.Size([2])
+2023-12-19 23:12:49,844 - DEBUG - linear_forward - cl_conc_out first 5 values tensor([ 0., -2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,844 - DEBUG - linear_forward - cu_conc_out first 5 values tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,844 - DEBUG - Forward pass for layer 2 done - lb and ub of layer 2 first 5 values lb:tensor([ 0., -2.], grad_fn=<SliceBackward0>)  - ub:tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,844 - DEBUG - Forward pass for layer 2 done - layer.lb address: 0x22de8f48360, layer.ub address: 0x22de8f48680
+2023-12-19 23:12:49,845 - DEBUG - Deeppoly verifier - Calling Forward pass layer 3 - ReLuTransformer
+2023-12-19 23:12:49,845 - INFO - ReLU layer propagation... ReLU()
+2023-12-19 23:12:49,846 - DEBUG - relu_forward - cl_conc first 5 values tensor([0., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,846 - DEBUG - relu_forward - cu_conc first 5 values tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,846 - DEBUG - Forward pass for layer 3 done - lb and ub of layer 3 first 5 values lb:tensor([0., 0.], grad_fn=<SliceBackward0>)  - ub:tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,846 - DEBUG - Forward pass for layer 3 done - layer.lb address: 0x22de8f48810, layer.ub address: 0x22de8f488b0
+2023-12-19 23:12:49,846 - DEBUG - Deeppoly verifier - Calling Forward pass layer 4 - LinearTransformer
+2023-12-19 23:12:49,846 - INFO - Linear layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,846 - DEBUG - linear_forward -  upper constraints shape : torch.Size([2, 2]), upper constraints bias : torch.Size([2]), lower constraints shape : torch.Size([2, 2]), lower constraints bias : torch.Size([2])
+2023-12-19 23:12:49,846 - DEBUG - linear_forward -  lower bounds shape : torch.Size([2]), upper bounds shape : torch.Size([2])
+2023-12-19 23:12:49,849 - DEBUG - linear_forward - cl_conc_out first 5 values tensor([1., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,850 - DEBUG - linear_forward - cu_conc_out first 5 values tensor([7., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,851 - DEBUG - Forward pass for layer 4 done - lb and ub of layer 4 first 5 values lb:tensor([1., 0.], grad_fn=<SliceBackward0>)  - ub:tensor([7., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,852 - DEBUG - Forward pass for layer 4 done - layer.lb address: 0x22de8f48c70, layer.ub address: 0x22de8f48ae0
+2023-12-19 23:12:49,852 - DEBUG - Deeppoly verifier - Calling Forward pass layer 5 - LinearTransformer
+2023-12-19 23:12:49,852 - INFO - Linear layer propagation... Linear(in_features=2, out_features=1, bias=True)
+2023-12-19 23:12:49,852 - DEBUG - linear_forward -  upper constraints shape : torch.Size([1, 2]), upper constraints bias : torch.Size([1]), lower constraints shape : torch.Size([1, 2]), lower constraints bias : torch.Size([1])
+2023-12-19 23:12:49,852 - DEBUG - linear_forward -  lower bounds shape : torch.Size([2]), upper bounds shape : torch.Size([2])
+2023-12-19 23:12:49,853 - DEBUG - linear_forward - cl_conc_out first 5 values tensor([-1.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,854 - DEBUG - linear_forward - cu_conc_out first 5 values tensor([7.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,854 - DEBUG - Forward pass for layer 5 done - lb and ub of layer 5 first 5 values lb:tensor([-1.], grad_fn=<SliceBackward0>)  - ub:tensor([7.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,855 - DEBUG - Forward pass for layer 5 done - layer.lb address: 0x22de8f49030, layer.ub address: 0x22de8f48ef0
+2023-12-19 23:12:49,855 - DEBUG - Forward pass done - Verifier net  : Sequential(
+  (0): LinearTransformer(
+    (layer): Linear(in_features=2, out_features=2, bias=True)
+  )
+  (1): ReLuTransformer(
+    (layer): ReLU()
+  )
+  (2): LinearTransformer(
+    (layer): Linear(in_features=2, out_features=2, bias=True)
+  )
+  (3): ReLuTransformer(
+    (layer): ReLU()
+  )
+  (4): LinearTransformer(
+    (layer): Linear(in_features=2, out_features=2, bias=True)
+  )
+  (5): LinearTransformer(
+    (layer): Linear(in_features=2, out_features=1, bias=True)
+  )
+)
+2023-12-19 23:12:49,855 - DEBUG - -------Concrete bounds state-----------
+2023-12-19 23:12:49,855 - DEBUG - Concrete bounds for layer 0 - LinearTransformer(
+  (layer): Linear(in_features=2, out_features=2, bias=True)
+) - lb: tensor([-2., -2.], grad_fn=<AddBackward0>), ub: tensor([2., 2.], grad_fn=<AddBackward0>)
+2023-12-19 23:12:49,856 - DEBUG - Concrete bounds for layer 1 - ReLuTransformer(
+  (layer): ReLU()
+) - lb: tensor([0., 0.], grad_fn=<ReluBackward0>), ub: tensor([2., 2.], grad_fn=<ReluBackward0>)
+2023-12-19 23:12:49,857 - DEBUG - Concrete bounds for layer 2 - LinearTransformer(
+  (layer): Linear(in_features=2, out_features=2, bias=True)
+) - lb: tensor([ 0., -2.], grad_fn=<AddBackward0>), ub: tensor([4., 2.], grad_fn=<AddBackward0>)
+2023-12-19 23:12:49,857 - DEBUG - Concrete bounds for layer 3 - ReLuTransformer(
+  (layer): ReLU()
+) - lb: tensor([0., 0.], grad_fn=<ReluBackward0>), ub: tensor([4., 2.], grad_fn=<ReluBackward0>)
+2023-12-19 23:12:49,857 - DEBUG - Concrete bounds for layer 4 - LinearTransformer(
+  (layer): Linear(in_features=2, out_features=2, bias=True)
+) - lb: tensor([1., 0.], grad_fn=<AddBackward0>), ub: tensor([7., 2.], grad_fn=<AddBackward0>)
+2023-12-19 23:12:49,857 - DEBUG - Concrete bounds for layer 5 - LinearTransformer(
+  (layer): Linear(in_features=2, out_features=1, bias=True)
+) - lb: tensor([-1.], grad_fn=<AddBackward0>), ub: tensor([7.], grad_fn=<AddBackward0>)
+2023-12-19 23:12:49,857 - DEBUG - ---------------End of concrete bounds state---------------
+2023-12-19 23:12:49,860 - DEBUG - Backsubstitution 3 on prev_layer ReLU()
+2023-12-19 23:12:49,860 - DEBUG - Backsubstitution 4 on curr_layer Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,860 - DEBUG - Prev layer, layer 3 ub first 5 values tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,860 - DEBUG - Prev layer, layer 3 lb first 5 values tensor([0., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,861 - DEBUG - Prev layer lb address: 0x22de8f48810, prev layer ub address: 0x22de8f488b0
+2023-12-19 23:12:49,861 - DEBUG - Backsubstitution 4 - old uc shape : torch.Size([1, 2]) , old uc_b shape : torch.Size([1]), old lc shape : torch.Size([1, 2]), old lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,861 - DEBUG - Backsubstitution 4 - new uc shape : torch.Size([1, 2]) , new uc_b shape : torch.Size([1]), new lc shape : torch.Size([1, 2]), new lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,861 - DEBUG - Backsubstitution 4 : calling concretize bounds
+2023-12-19 23:12:49,861 - DEBUG - Concretize bounds arguments - updated uc shape : torch.Size([1, 2]), updated uc_b shape : torch.Size([1]), updated lc shape : torch.Size([1, 2]), updated lc_b shape : torch.Size([1]), prev_layer_lb shape : torch.Size([2]), prev_layer_ub shape : torch.Size([2])
+2023-12-19 23:12:49,863 - DEBUG - Backsubstitution 2 on prev_layer Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,863 - DEBUG - Backsubstitution 3 on curr_layer ReLU()
+2023-12-19 23:12:49,863 - DEBUG - Prev layer, layer 2 ub first 5 values tensor([4., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,863 - DEBUG - Prev layer, layer 2 lb first 5 values tensor([ 0., -2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,863 - DEBUG - Prev layer lb address: 0x22de8f48360, prev layer ub address: 0x22de8f48680
+2023-12-19 23:12:49,864 - DEBUG - Backsubstitution 3 - old uc shape : torch.Size([1, 2]) , old uc_b shape : torch.Size([1]), old lc shape : torch.Size([1, 2]), old lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,864 - DEBUG - Backsubstitution 3 - new uc shape : torch.Size([1, 2]) , new uc_b shape : torch.Size([1]), new lc shape : torch.Size([1, 2]), new lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,865 - DEBUG - Backsubstitution 3 : calling concretize bounds
+2023-12-19 23:12:49,865 - DEBUG - Concretize bounds arguments - updated uc shape : torch.Size([1, 2]), updated uc_b shape : torch.Size([1]), updated lc shape : torch.Size([1, 2]), updated lc_b shape : torch.Size([1]), prev_layer_lb shape : torch.Size([2]), prev_layer_ub shape : torch.Size([2])
+2023-12-19 23:12:49,868 - DEBUG - Backsubstitution 1 on prev_layer ReLU()
+2023-12-19 23:12:49,869 - DEBUG - Backsubstitution 2 on curr_layer Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,869 - DEBUG - Prev layer, layer 1 ub first 5 values tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,869 - DEBUG - Prev layer, layer 1 lb first 5 values tensor([0., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,869 - DEBUG - Prev layer lb address: 0x22de8f48720, prev layer ub address: 0x22de8f48040
+2023-12-19 23:12:49,870 - DEBUG - Backsubstitution 2 - old uc shape : torch.Size([1, 2]) , old uc_b shape : torch.Size([1]), old lc shape : torch.Size([1, 2]), old lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,870 - DEBUG - Backsubstitution 2 - new uc shape : torch.Size([1, 2]) , new uc_b shape : torch.Size([1]), new lc shape : torch.Size([1, 2]), new lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,870 - DEBUG - Backsubstitution 2 : calling concretize bounds
+2023-12-19 23:12:49,870 - DEBUG - Concretize bounds arguments - updated uc shape : torch.Size([1, 2]), updated uc_b shape : torch.Size([1]), updated lc shape : torch.Size([1, 2]), updated lc_b shape : torch.Size([1]), prev_layer_lb shape : torch.Size([2]), prev_layer_ub shape : torch.Size([2])
+2023-12-19 23:12:49,872 - DEBUG - Backsubstitution 0 on prev_layer Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:12:49,873 - DEBUG - Backsubstitution 1 on curr_layer ReLU()
+2023-12-19 23:12:49,873 - DEBUG - Prev layer, layer 0 ub first 5 values tensor([2., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,874 - DEBUG - Prev layer, layer 0 lb first 5 values tensor([-2., -2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:12:49,874 - DEBUG - Prev layer lb address: 0x22de75fe7f0, prev layer ub address: 0x22de720a2a0
+2023-12-19 23:12:49,875 - DEBUG - Backsubstitution 1 - old uc shape : torch.Size([1, 2]) , old uc_b shape : torch.Size([1]), old lc shape : torch.Size([1, 2]), old lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,875 - DEBUG - Backsubstitution 1 - new uc shape : torch.Size([1, 2]) , new uc_b shape : torch.Size([1]), new lc shape : torch.Size([1, 2]), new lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,875 - DEBUG - Backsubstitution 1 : calling concretize bounds
+2023-12-19 23:12:49,875 - DEBUG - Concretize bounds arguments - updated uc shape : torch.Size([1, 2]), updated uc_b shape : torch.Size([1]), updated lc shape : torch.Size([1, 2]), updated lc_b shape : torch.Size([1]), prev_layer_lb shape : torch.Size([2]), prev_layer_ub shape : torch.Size([2])
+2023-12-19 23:12:49,877 - DEBUG - Backsubstitution 0 - old uc shape : torch.Size([1, 2]) , old uc_b shape : torch.Size([1]), old lc shape : torch.Size([1, 2]), old lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,877 - DEBUG - Backsubstitution 0 - new uc shape : torch.Size([1, 2]) , new uc_b shape : torch.Size([1]), new lc shape : torch.Size([1, 2]), new lc_b shape : torch.Size([1])
+2023-12-19 23:12:49,877 - DEBUG - Backsubstitution 0 : calling concretize bounds
+2023-12-19 23:12:49,877 - DEBUG - Concretize bounds arguments - updated uc shape : torch.Size([1, 2]), updated uc_b shape : torch.Size([1]), updated lc shape : torch.Size([1, 2]), updated lc_b shape : torch.Size([1]), prev_layer_lb shape : torch.Size([2]), prev_layer_ub shape : torch.Size([2])

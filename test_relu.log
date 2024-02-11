@@ -1,0 +1,13 @@
+2023-12-19 23:39:11,143 - INFO - ----Testing forward pass with lower bounds >= 0-----
+2023-12-19 23:39:11,143 - INFO - ReLU layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:39:11,143 - DEBUG - relu_forward - cl_conc first 5 values tensor([1., 2.], grad_fn=<SliceBackward0>)
+2023-12-19 23:39:11,143 - DEBUG - relu_forward - cu_conc first 5 values tensor([3., 4.])
+2023-12-19 23:39:11,152 - INFO - ----Testing forward pass with lower bounds < 0 and upper bounds > 0-----
+2023-12-19 23:39:11,153 - INFO - Lower bounds: tensor([-3., -2.]), upper bounds: tensor([1., 3.])
+2023-12-19 23:39:11,153 - INFO - ReLU layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:39:11,154 - DEBUG - relu_forward - cl_conc first 5 values tensor([-0.0871, -0.0177], grad_fn=<SliceBackward0>)
+2023-12-19 23:39:11,154 - DEBUG - relu_forward - cu_conc first 5 values tensor([1., 3.])
+2023-12-19 23:39:11,157 - INFO - ----Testing forward pass with upper bounds <= 0-----
+2023-12-19 23:39:11,157 - INFO - ReLU layer propagation... Linear(in_features=2, out_features=2, bias=True)
+2023-12-19 23:39:11,157 - DEBUG - relu_forward - cl_conc first 5 values tensor([0., 0.], grad_fn=<SliceBackward0>)
+2023-12-19 23:39:11,157 - DEBUG - relu_forward - cu_conc first 5 values tensor([0., 0.])

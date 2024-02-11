@@ -1,0 +1,108 @@
+digraph {
+	graph [size="12,12"]
+	node [align=left fontname=monospace fontsize=10 height=0.2 ranksep=0.1 shape=box style=filled]
+	1426303707280 [label="
+ ()" fillcolor=darkolivegreen1]
+	1426301202592 [label=NegBackward0]
+	1426301194336 -> 1426301202592
+	1426301194336 [label="SumBackward0
+--------------------
+self_sym_sizes: (2,)"]
+	1426301197168 -> 1426301194336
+	1426301197168 [label="AddBackward0
+------------
+alpha: 1"]
+	1426301197120 -> 1426301197168
+	1426301197120 [label="SumBackward1
+-----------------------------
+dim           : (4294967295,)
+keepdim       :         False
+self_sym_sizes:        (2, 2)"]
+	1426301201584 -> 1426301197120
+	1426301201584 -> 1426324159792 [dir=none]
+	1426324159792 [label="other
+ (2, 2)" fillcolor=orange]
+	1426301201584 [label="MulBackward0
+---------------------
+other: [saved tensor]
+self :           None"]
+	1426301193136 -> 1426301201584
+	1426301193136 -> 1426292089664 [dir=none]
+	1426292089664 [label="mat2
+ (2, 2)" fillcolor=orange]
+	1426301193136 [label="MmBackward0
+--------------------------------
+mat2            : [saved tensor]
+mat2_sym_sizes  :         (2, 2)
+mat2_sym_strides:             ()
+self            :           None
+self_sym_sizes  :         (2, 2)
+self_sym_strides:         (2, 1)"]
+	1426301205088 -> 1426301193136
+	1426301205088 -> 1426298343392 [dir=none]
+	1426298343392 [label="self
+ (2, 2)" fillcolor=orange]
+	1426301205088 [label="MulBackward0
+---------------------
+other:           None
+self : [saved tensor]"]
+	1426301197216 -> 1426301205088
+	1426301197216 [label="AddBackward0
+------------
+alpha: 1"]
+	1426324789888 -> 1426301197216
+	1426324789888 -> 1426303130960 [dir=none]
+	1426303130960 [label="self
+ (2, 2)" fillcolor=orange]
+	1426324789888 [label="MulBackward0
+---------------------
+other:           None
+self : [saved tensor]"]
+	1426324788352 -> 1426324789888
+	1426324788352 [label="RepeatBackward0
+----------------------
+repeats       : (2, 1)
+self_sym_sizes: (1, 2)"]
+	1426324789072 -> 1426324788352
+	1426324789072 [label="TransposeBackward0
+------------------
+dim0: 4294967295
+dim1: 4294967294"]
+	1426324789504 -> 1426324789072
+	1426324789504 [label="UnsqueezeBackward0
+------------------
+dim: 4294967295"]
+	1426324785712 -> 1426324789504
+	1426324785712 -> 1426303356816 [dir=none]
+	1426303356816 [label="condition
+ (2)" fillcolor=orange]
+	1426324785712 [label="WhereBackward0
+-------------------------
+condition: [saved tensor]"]
+	1426324789984 -> 1426324785712
+	1426324789984 -> 1426292924608 [dir=none]
+	1426292924608 [label="result
+ (2)" fillcolor=orange]
+	1426324789984 [label="SigmoidBackward0
+----------------------
+result: [saved tensor]"]
+	1426324788688 -> 1426324789984
+	1426286919200 [label="1.beta
+ (2)" fillcolor=lightblue]
+	1426286919200 -> 1426324788688
+	1426324788688 [label=AccumulateGrad]
+	1426301194384 -> 1426301197168
+	1426301194384 [label="AddBackward0
+------------
+alpha: 1"]
+	1426301200960 -> 1426301194384
+	1426301200960 -> 1426288749488 [dir=none]
+	1426288749488 [label="vec
+ (2)" fillcolor=orange]
+	1426301200960 [label="MvBackward0
+--------------------
+self:           None
+vec : [saved tensor]"]
+	1426301205088 -> 1426301200960
+	1426301202592 -> 1426303707280
+}
