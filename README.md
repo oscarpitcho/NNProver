@@ -1,5 +1,8 @@
 # NN Prover
 
+## Project Description
+This is a sound formal robustness prover for Neural Networks. it is based on [Sing et al.](https://ggndpsngh.github.io/files/DeepPoly.pdf). Our implementation propagates initial box constraints on the input throughout the network. Additionally to ensure
+a high degree of precision, we regularly back substitute constraints through the network and, if required, differentiate our prover to fine-tune it to the case being proved.
 
 ## Folder structure
 In the directory `code`, you can find 3 files and one folder: 
