@@ -1,5 +1,4 @@
-# RIAI 2023 Course Project
-
+# NN Prover
 
 
 ## Folder structure
@@ -10,17 +9,13 @@ In the directory `code`, you can find 3 files and one folder:
 - The folder `utils` contains helper methods for loading and initialization (There is most likely no need to change anything here).
 
 
-In the directory `models`, you can find 14 neural networks (9 fully connected and 5 convolutional) weights. These networks are loaded using PyTorch in `verifier.py`. Note that we included two `_base` networks which do not contain activation functions.
-
-In the directory `test_cases`, you can find 13 subfolders (the folder for `fc_6` contains both examples for `cifar10` and `mnist`). Each subfolder is associated with one of the networks using the same name. In a subfolder corresponding to a network, you can find 2 test cases for each network. Note that for the base networks, we provide you with 5 test cases each. Also, as we use 2 different versions (mnist, cifar10) of `fc_6`, the corresponding folder contains 2 test cases per dataset. As explained in the lecture, these test cases **are not** part of the set of test cases that we will use for the final evaluation.
+In the directory `models`, you can find 14 neural networks (9 fully connected and 5 convolutional) weights. These networks are loaded using PyTorch in `verifier.py`. 
+In the directory `test_cases`, you can find 13 subfolders (the folder for `fc_6` contains both examples for `cifar10` and `mnist`). Each subfolder is associated with one of the networks using the same name. In a subfolder corresponding to a network, you can find 2 test cases for each network. 
 
 Note that all inputs are images with pixel values between 0 and 1. The same range also applies to all abstract bounds that we want to verify. 
 
 ## Setup instructions
 
-We recommend you install a [Python virtual environment](https://docs.python.org/3/library/venv.html) to ensure dependencies are the same as the ones we will use for evaluation.
-To evaluate your solution, we are going to use Python 3.10.
-You can create a virtual environment and install the dependencies using the following commands:
 
 ```bash
 $ virtualenv venv --python=python3.10
@@ -39,7 +34,7 @@ for `mamba` simply replace `conda` with `mamba`.
 
 ## Running the verifier
 
-We will run your verifier from `code` directory using the command:
+To test your verifier, use the following command template 
 
 ```bash
 $ python code/verifier.py --net {net} --spec test_cases/{net}/img{id}_{dataset}_{eps}.txt
@@ -51,8 +46,7 @@ In this command,
 - `dataset` is the dataset name, i.e.,  either `mnist` or `cifar10`.
 - `eps` is the perturbation that the verifier should certify in this test case.
 
-To test your verifier, you can run, for example:
-
+For instance
 ```bash
 $ python code/verifier.py --net fc_1 --spec test_cases/fc_1/img0_mnist_0.1394.txt
 ```
@@ -65,5 +59,6 @@ chmod +x code/evaluate
 code/evaluate
 ```
 
-## Submission 
-Note that on the dates specified in the presentation, we will pull the master branch both for preliminary feedback and final grading (and push the results to a new branch). Please have your solution on this (master) branch at that point in time.
+## References
+
+This project was done for the 2023 edition of the Reliable & Trustworthy AI (RTAI) course @ ETHZ.
