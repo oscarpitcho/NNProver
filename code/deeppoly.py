@@ -11,6 +11,29 @@ logger = logging.getLogger(__name__)
 
 class DeepPoly:
     def __init__(self, net : torch.nn.Sequential, input_size : int):
+        """
+        Neural network verifier using the DeepPoly abstract domain for computing sound output bounds.
+        
+        DeepPoly provides formal verification of neural network properties by propagating symbolic
+        constraints and concrete bounds through the network layers. It computes guaranteed 
+        over-approximations of network outputs given box-constrained inputs.
+        
+        The verifier transforms each layer into an abstract transformer that maintains both:
+        - Symbolic linear constraints (expressing outputs as functions of inputs)
+        - Concrete interval bounds (min/max values for each neuron)
+        
+        For non-linear layers (ReLU), it uses convex relaxations with learnable parameters
+        to obtain tighter bounds through backsubstitution.
+        
+        Parameters
+        ----------
+        net : torch.nn.Sequential
+            The neural network to verify. Must be a sequential model containing
+            supported layers (Linear, Conv2d, ReLU, LeakyReLU).
+        input_size : int
+            The total size of the flattened input to the network.
+            For images: input_size = channels * height * width.
+        """
         super(DeepPoly, self).__init__()
         # These variables will store the system of the output layer over time. 
         # There will always be n_classes == n_constraints and the number of variables will change each time we backsub
@@ -28,24 +51,25 @@ class DeepPoly:
         self.backsub_order = 0
        
        #Create the abstract network with the transformers of each layer
+        prevl_input_size = input_size
         verifier_net = []
         for layer in self.net:
             if isinstance(layer, torch.nn.Linear):
                 self.last = LinearTransformer(layer)
                 verifier_net.append(self.last)
-                input_size = layer.out_features
+                prevl_input_size = layer.out_features
 
             elif isinstance(layer, torch.nn.Conv2d):
-                self.last = ConvTransformer(layer, input_size)
+                self.last = ConvTransformer(layer, prevl_input_size)
                 verifier_net.append(self.last)
-                input_size = self.last.out_features
+                prevl_input_size = self.last.out_features
 
             elif isinstance(layer, torch.nn.ReLU):
-                self.last = ReLuTransformer(layer, input_size)
+                self.last = ReLuTransformer(layer, prevl_input_size)
                 verifier_net.append(self.last)
 
             elif isinstance(layer, torch.nn.LeakyReLU):
-                self.last = LeakyReLuTransformer(layer, input_size)
+                self.last = LeakyReLuTransformer(layer, prevl_input_size)
                 verifier_net.append(self.last)
         
         self.verifier_net = torch.nn.Sequential(*verifier_net)
@@ -316,7 +340,6 @@ class ConvTransformer(torch.nn.Module):
 
             new_lc = torch.matmul(lc, layer_contstraints)
             new_lc_b = torch.matmul(lc, layer_constraints_b) + lc_b
-
             return new_uc, new_uc_b, new_lc, new_lc_b
     
     def backwards(self, uc: torch.Tensor, uc_b: torch.Tensor,  lc : torch.Tensor, lc_b : torch.Tensor):
@@ -405,7 +428,6 @@ class ReLuTransformer(torch.nn.Module):
         self.lb = torch.where(mask_cross, beta_bounded * self.lb, self.lb.detach())
         self.ub = torch.where(mask_cross, self.ub, self.ub.detach())
 
-
         #SET THE CONSTRAINTS FOR THE DIFFERENT CASES AND SAVE THEM
         #when lb >= 0, we are constrained on the segment xi = xj from the ReLu
         self.set_constraints(uc= ones, 
@@ -420,8 +442,7 @@ class ReLuTransformer(torch.nn.Module):
                             lc = zeros,
                             lc_b = zeros,
                             mask= mask_upper)
-        
-        
+                
         #when lb < 0 and ub > 0, the tightest shape is upper-constrained by the segment xj = lambda * xi + mu
         #where lambda = ub / (ub - lb) and mu = - lb * lambda
         #and lower-constrained by the segment xj = beta * xi
@@ -449,7 +470,6 @@ class LeakyReLuTransformer(torch.nn.Module):
         self.uc_b = torch.zeros(self.input_size)
         self.lc = torch.zeros(self.input_size)
         self.lc_b = torch.zeros(self.input_size)
-
         '''
         This class should act as a ReLU transformer when alpha = 0 
         
