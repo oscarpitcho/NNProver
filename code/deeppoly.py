@@ -7,21 +7,15 @@ import itertools
 import logging
 from typing import Any, Union
 
-
 logger = logging.getLogger(__name__)
-
 
 class DeepPoly:
     def __init__(self, net : torch.nn.Sequential, input_size : int):
         super(DeepPoly, self).__init__()
-        
+        # These variables will store the system of the output layer over time. 
+        # There will always be n_classes == n_constraints and the number of variables will change each time we backsub
         self.net = net
         self.last = None
-
-
-        """These variables will store the system of the output layer over time. 
-        There will always be n_classes == n_constraints and the number of variables will change each time we backsub"""
-
         self.uc = None
         self.uc_b = None
         self.lc = None
@@ -55,40 +49,30 @@ class DeepPoly:
                 verifier_net.append(self.last)
         
         self.verifier_net = torch.nn.Sequential(*verifier_net)
-
-
+        
     #To maintain the same interface
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         return self.forward(*args, **kwds)
 
-
     def backsubstitute_from_layer(self, from_layer : int):
-
         """
         uc, uc_b, lc, lc_b contain the upper and lower symbolic constraints for the layer from layer.
 
         They have one row / constraint per neuron in the layer from_layer. We are going to refine these constraints via backsubstitution
         to thenn compute more precise concrete bounds on the of from layer
-        
         """
 
         uc = self.verifier_net[from_layer].uc
         uc_b = self.verifier_net[from_layer].uc_b
         lc = self.verifier_net[from_layer].lc
         lc_b = self.verifier_net[from_layer].lc_b
-    
-
         
         for i in range(from_layer - 1 , -1, -1):
             uc, uc_b, lc, lc_b = self.verifier_net[i].backwards(uc, uc_b, lc, lc_b)
 
-    
         #Concretize the new bounds using the function
         upper_bounds, lower_bounds = concretize_bounds(uc, uc_b, lc, lc_b, self.input_box_bounds_lower, self.input_box_bounds_upper)
-
-
         return lower_bounds, upper_bounds
-
 
     def forward(self, lower_bounds : torch.Tensor, upper_bounds : torch.Tensor):
         """
@@ -103,15 +87,11 @@ class DeepPoly:
             - lower_bounds (n_batch, n_classes) or (n_classes) if there are no batches
             - upper_bounds (n_batch, n_classes) or (n_classes) if there are no batches
         """
-
         lower_bounds = lower_bounds.reshape(-1).clone()
         upper_bounds = upper_bounds.reshape(-1).clone() 
         
         self.input_box_bounds_upper = upper_bounds
         self.input_box_bounds_lower = lower_bounds
-
-     
-
 
         for i, layer in enumerate(self.verifier_net):
 
@@ -127,16 +107,7 @@ class DeepPoly:
                lower_bounds, upper_bounds = self.backsubstitute_from_layer(i-1)
                lower_bounds, upper_bounds = layer(lower_bounds, upper_bounds)
             assert (upper_bounds >= lower_bounds).all(), f"Upper bound is smaller than lower bound at layer {i+1}/{len(self.verifier_net)}: {layer}"
-
-            logger.debug(f"Forward pass for layer {i} done - lb and ub of layer {i} first 5 values lb:{layer.lb[:5]}  - ub:{layer.ub[:5]}" )
-            logger.debug(f"Forward pass for layer {i} done - layer.lb address: {hex(id(layer.lb))}, layer.ub address: {hex(id(layer.ub))}" )
-
-            logger.debug(f'forward pass - lb requires grad: {layer.lb.requires_grad}, ')
-            logger.debug(f'forward pass - ub requires grad: {layer.ub.requires_grad}')
-        
-
-
-             
+            
         #We update the constraints of the last output to be those of the last layer
         #This might happen after a gradient descent step hence we need to rerun the forward pass
         self.uc = self.last.uc
@@ -144,31 +115,23 @@ class DeepPoly:
         self.lc = self.last.lc
         self.lc_b = self.last.lc_b
 
-
-
         logger.debug(f"Forward pass done - Verifier net  : {self.verifier_net}")
         logger.debug(f"-------Concrete bounds state-----------")
         for i, layer in enumerate(self.verifier_net):
             logger.debug(f"Concrete bounds for layer first 5 valus {i} - {layer} - lb: {layer.lb[:5]}, ub: {layer.ub[:5]}")
 
-        logger.debug(f"---------------End of concrete bounds state---------------")
-
         lower_bounds, upper_bounds = self.backsubstitute_from_layer(len(self.verifier_net) - 1)
-
         return lower_bounds, upper_bounds
     
-    
+
 class LinearTransformer(torch.nn.Module):
     def __init__(self, layer : torch.nn.Linear):
         super(LinearTransformer, self).__init__()
         self.layer = layer
-
-
         """
         These are the constraints in shape (size_layer_out, size_layer_in)
         i.e alternatively n_constraints, n_vars
         """
-
         # Pattern match in deeppoly function
         self.uc = layer.weight
         self.uc_b = layer.bias
@@ -177,13 +140,10 @@ class LinearTransformer(torch.nn.Module):
     
         self.ub = torch.zeros(layer.out_features)
         self.lb = torch.zeros(layer.out_features)
-
-    
+        
     def forward(self, lower_bounds : torch.Tensor, upper_bounds : torch.Tensor):
         #python code/verifier.py --net fc_base --spec test_cases/fc_base/img0_mnist_0.2456.txt --> not verified basic
         #python code/verifier.py --net fc_base --spec test_cases/fc_base/img2_mnist_0.0784.txt --> verified basic
-
-
         '''
         cu = torch.tensor([[1.0, 1.0], [0.0, 1.0]])
         cu_b = torch.tensor([1.0, 0.0])
@@ -196,42 +156,28 @@ class LinearTransformer(torch.nn.Module):
         #logger.debug(f"linear layer weights shape: {self.layer.weight.shape}, bias shape: {self.layer.bias.shape}")
         #logger.debug(f"linear_forward - cl_conc_in first 5 values {lower_bounds[:5]}")
         #logger.debug(f"linear_forward - cu_conc_in first 5 values {upper_bounds[:5]}")
-        
-
-      
-
-        logger.debug(f"linear_forward -  upper constraints shape : {self.uc.shape}, upper constraints bias : {self.uc_b.shape}, lower constraints shape : {self.lc.shape}, lower constraints bias : {self.lc_b.shape}")
-        logger.debug(f"linear_forward -  lower bounds shape : {lower_bounds.shape}, upper bounds shape : {upper_bounds.shape}")
-        
-
-
+        #logger.debug(f"linear_forward -  upper constraints shape : {self.uc.shape}, upper constraints bias : {self.uc_b.shape}, lower constraints shape : {self.lc.shape}, lower constraints bias : {self.lc_b.shape}")
+        #logger.debug(f"linear_forward -  lower bounds shape : {lower_bounds.shape}, upper bounds shape : {upper_bounds.shape}")
         self.lb = lower_bounds.clone()
         self.ub = upper_bounds.clone()
-
         self.ub, self.lb = concretize_bounds(self.uc, self.uc_b, self.lc, self.lc_b, self.lb, self.ub)
-
+        
         logger.debug(f"linear_forward - cl_conc_out first 5 values {self.lb[:5]}")
         logger.debug(f"linear_forward - cu_conc_out first 5 values {self.ub[:5]}")
 
-        
         #print(f"UPPER CONSTRAINTS shape: {self.uc.shape}")
         return self.lb, self.ub
-    
-
-
 
     @staticmethod
     def do_backsub(uc : torch.Tensor, uc_b : torch.Tensor, 
                    lc : torch.Tensor, lc_b: torch.Tensor, 
                    layer_constraints : torch.Tensor, layer_constraints_b : torch.Tensor):
             """Used for testing and modularity puposes"""
-
             new_uc = torch.matmul(uc, layer_constraints) 
             new_uc_b = torch.matmul(uc, layer_constraints_b) + uc_b
 
             new_lc = torch.matmul(lc, layer_constraints)
             new_lc_b = torch.matmul(lc, layer_constraints_b) + lc_b
-
             return new_uc, new_uc_b, new_lc, new_lc_b
 
     def backwards(self, uc: torch.Tensor, uc_b: torch.Tensor, lc: torch.Tensor, lc_b: torch.Tensor):
@@ -253,13 +199,9 @@ class LinearTransformer(torch.nn.Module):
             - uc_b: symbolic upper bound constraints bias for previous layer (n_constraints_last_layer)
             - lc: symbolic lower bound constraints for previous layer (n_constraints_last_layer, n_vars_previous_layer)
             - lc_b: symbolic lower bound constraints bias for previous layer (n_constraints_last_layer)     
-        """
-        
+        """        
         return self.do_backsub(uc, uc_b, lc, lc_b, self.uc, self.uc_b)
     
-
-
-
 class ConvTransformer(torch.nn.Module):
     def __init__(self, layer : torch.nn.Conv2d, input_size : int):
         super(ConvTransformer, self).__init__()
@@ -286,7 +228,6 @@ class ConvTransformer(torch.nn.Module):
 
         # Build the weight matrix that 
         weight_matrix = self.build_weight_matrix()
-
         self.constraints = weight_matrix
 
         # Adjusting the shapes of bias tensors
@@ -295,7 +236,6 @@ class ConvTransformer(torch.nn.Module):
         else:
             self.constraints_b = torch.zeros(self.n_constraints)
         
-
         self.uc = weight_matrix
         self.uc_b = self.constraints_b
         self.lc = weight_matrix
@@ -308,7 +248,6 @@ class ConvTransformer(torch.nn.Module):
         assert self.constraints_b.shape == (self.n_constraints,)
     
     def build_weight_matrix(self):
-
         """Transforms a convolutional layer into an equivalent linear layer."""
 
         width_with_padding = self.input_width + 2 * self.padding
@@ -324,7 +263,7 @@ class ConvTransformer(torch.nn.Module):
                         (self.filter_height - 1) * width_with_padding + self.filter_height
 
         row_fillers = torch.zeros((self.layer.out_channels, filler_length))
-
+        
         # Fill the row fillers with the weights of the convolutional layer
         for out_channel, in_channel, kernel_row in itertools.product(range(self.layer.out_channels), 
                                                                     range(self.layer.in_channels), 
@@ -354,9 +293,7 @@ class ConvTransformer(torch.nn.Module):
         result_matrix = torch.from_numpy(np.delete(result_matrix.detach().numpy(), cols_to_remove, axis=1))
 
         return result_matrix
-    
-    
-    
+        
     def forward(self, lower_bounds : torch.Tensor, upper_bounds : torch.Tensor):
         #python code/verifier.py --net conv_base --spec test_cases/conv_base/img0_mnist_0.0707.txt
         #python code/verifier.py --net conv_base --spec test_cases/conv_base/img1_mnist_0.0014.txt
@@ -367,8 +304,6 @@ class ConvTransformer(torch.nn.Module):
         self.ub = upper_bounds.clone()
        
         self.ub,self.lb = concretize_bounds(self.constraints, self.constraints_b, self.constraints, self.constraints_b, self.lb, self.ub)
-
-        
         return self.lb, self.ub
     
     @staticmethod
@@ -376,7 +311,6 @@ class ConvTransformer(torch.nn.Module):
                    lc : torch.Tensor, lc_b: torch.Tensor, 
                    layer_contstraints : torch.Tensor, layer_constraints_b : torch.Tensor):
             """Used for testing puposes"""
-
             new_uc = torch.matmul(uc, layer_contstraints) 
             new_uc_b = torch.matmul(uc, layer_constraints_b) + uc_b
 
@@ -387,9 +321,7 @@ class ConvTransformer(torch.nn.Module):
     
     def backwards(self, uc: torch.Tensor, uc_b: torch.Tensor,  lc : torch.Tensor, lc_b : torch.Tensor):
         return self.do_backsub(uc, uc_b, lc, lc_b, self.uc, self.uc_b)
-    
-
-        
+            
 class ReLuTransformer(torch.nn.Module):
     def __init__(self, layer, input_size : int):
         super(ReLuTransformer, self).__init__()
@@ -403,16 +335,10 @@ class ReLuTransformer(torch.nn.Module):
         self.ub = torch.zeros(self.input_size)
         self.lb = torch.zeros(self.input_size)
 
-        #self.beta = torch.nn.Parameter(torch.rand(self.input_size), requires_grad= True) #learnable parameter to determine the tightiest shape of the constraints
-        
-
         #0 initialisation
         self.beta = torch.nn.Parameter(torch.zeros(self.input_size), requires_grad= True) #learnable parameter to determine the tightiest shape of the constraints
         
     def set_constraints(self, uc : torch.Tensor, uc_b : torch.Tensor, lc : torch.Tensor, lc_b : torch.Tensor, mask : torch.Tensor):
-        
-        
-        #TODO: Check - Argument for this is that the computational graph should only take into account the operations
         # For nodes earlier in the network. Not for the previous runs of the network.
         self.uc = torch.where(mask, uc, self.uc.detach())
         self.uc_b = torch.where(mask, uc_b, self.uc_b.detach())
@@ -420,7 +346,6 @@ class ReLuTransformer(torch.nn.Module):
         self.lc_b = torch.where(mask, lc_b, self.lc_b.detach())
         
     def forward(self, lower_bounds : torch.Tensor, upper_bounds : torch.Tensor):
-
         """
         Passes the bounds through the ReLU layer and returns the concrete bounds after the ReLU layer. 
         It should also save the constraints of the layer : 
@@ -439,13 +364,10 @@ class ReLuTransformer(torch.nn.Module):
             - lower_bounds (n_batch, output_size)
             - upper_bounds (n_batch, output_size)
         """
-
-
         #python code/verifier.py --net fc_1 --spec test_cases/fc_1/img0_mnist_0.1394.txt --> not verified
         #python code/verifier.py --net fc_1 --spec test_cases/fc_1/img2_mnist_0.0692.txt --> verified
         #python code/verifier.py --net fc_2 --spec test_cases/fc_2/img0_mnist_0.1086.txt --> not verified
         #python code/verifier.py --net fc_2 --spec test_cases/fc_2/img3_mnist_0.0639.txt --> verified
-
         #python code/verifier.py --net conv_1 --spec test_cases/conv_1/img0_mnist_0.2302.txt --> not verified
         #python code/verifier.py --net conv_1 --spec test_cases/conv_1/img4_mnist_0.1241.txt --> verified
         
@@ -463,25 +385,19 @@ class ReLuTransformer(torch.nn.Module):
         ones = torch.ones(self.input_size)
 
         #SET MASKS FOR THE DIFFERENT CASES
-
         #when lb >= 0
         mask_lower = self.lb.ge(0)
+        
         #when ub <= 0
         mask_upper = self.ub.le(0)
+        
         #when lb < 0 and ub > 0
         mask_cross = ~ (mask_lower | mask_upper)
-
-
-
 
         #Note: torch.clamp quickly sets gradient to 0 after which there is no learning 
         beta_bounded = torch.nn.Sigmoid()(self.beta)
 
-
-        #beta_bounded = torch.clamp(self.beta, min=0, max=1)
-
         #SET THE LOWER AND UPPER BOUNDS FOR THE DIFFERENT CASES
-
         self.lb = torch.where(mask_lower, self.lb, self.lb.detach())
         self.ub = torch.where(mask_lower, self.ub, self.ub.detach())
         self.lb = torch.where(mask_upper, torch.zeros_like(self.lb), self.lb.detach())
@@ -505,36 +421,27 @@ class ReLuTransformer(torch.nn.Module):
                             lc_b = zeros,
                             mask= mask_upper)
         
-        '''
-        #when lb < 0 and ub > 0, the tightiest shape is upper-constrained by the segment xj = lambda * xi + mu
-        #                                           where lambda = ub / (ub - lb) and mu = - lb * lambda
-        #
-        #                                           and lower-constrained by the segment xj = beta * xi
-        #                                           where beta is a learnable parameter
-        '''
-
-        self.set_constraints(uc= lambda_,
+        
+        #when lb < 0 and ub > 0, the tightest shape is upper-constrained by the segment xj = lambda * xi + mu
+        #where lambda = ub / (ub - lb) and mu = - lb * lambda
+        #and lower-constrained by the segment xj = beta * xi
+        #where beta is a learnable parameter
+        self.set_constraints(uc  = lambda_,
                             uc_b = mu_,
                             lc = beta_bounded,
                             lc_b = zeros,
-                            mask= mask_cross)
-        
+                            mask = mask_cross)
         logger.debug(f"relu_forward - cl_conc first 5 values {self.lb[:5]}")
         logger.debug(f"relu_forward - cu_conc first 5 values {self.ub[:5]}")
-        
         return self.lb, self.ub
     
     def backwards(self, uc: torch.Tensor, uc_b: torch.Tensor, lc : torch.Tensor, lc_b : torch.Tensor):
         new_uc, new_uc_b, new_lc, new_lc_b = backsub_relu(uc, uc_b, lc, lc_b, self.uc, self.uc_b, self.lc, self.lc_b)
         return new_uc, new_uc_b, new_lc, new_lc_b 
-
-
-
-
+        
 class LeakyReLuTransformer(torch.nn.Module):
     def __init__(self, layer : Union[torch.nn.LeakyReLU, torch.nn.ReLU], input_size : int):
         super(LeakyReLuTransformer, self).__init__()
-        
         self.layer = layer
         self.input_size = input_size
 
@@ -552,9 +459,7 @@ class LeakyReLuTransformer(torch.nn.Module):
         else:
             self.alpha = 0.0
         
-
         self.beta = torch.nn.Parameter(torch.rand(self.input_size), requires_grad= True) #learnable parameter to determine the tightiest shape of the constraints
-
         self.ub = torch.zeros(self.input_size)
         self.lb = torch.zeros(self.input_size)
 
@@ -565,8 +470,6 @@ class LeakyReLuTransformer(torch.nn.Module):
         self.lc_b = torch.where(mask, lc_b, self.lc_b.detach())
     
     def forward(self, lower_bounds : torch.Tensor, upper_bounds : torch.Tensor):
-
-        
         """
         Passes the bounds through the ReLU layer and returns the concrete bounds after the ReLU layer. 
         It should also save the constraints of the layer : 
@@ -587,13 +490,7 @@ class LeakyReLuTransformer(torch.nn.Module):
         """
         #NETWORKS WITH RELU
         #python code/verifier.py --net fc_1 --spec test_cases/fc_1/img0_mnist_0.1394.txt --> not verified
-        #python code/verifier.py --net fc_1 --spec test_cases/fc_1/img2_mnist_0.0692.txt --> verified
-        #python code/verifier.py --net fc_2 --spec test_cases/fc_2/img0_mnist_0.1086.txt --> not verified
-        #python code/verifier.py --net fc_2 --spec test_cases/fc_2/img3_mnist_0.0639.txt --> verified
-
-        #python code/verifier.py --net conv_1 --spec test_cases/conv_1/img0_mnist_0.2302.txt --> not verified
-        #python code/verifier.py --net conv_1 --spec test_cases/conv_1/img4_mnist_0.1241.txt --> verified
-        
+        #python code/verifier.py --net fc_1 --spec test_cases/fc_1/img2_mnist_0.0692.txt --> verified      
 
         # NETWORKS WITH LEAKY RELU
         #alpha < 1
@@ -603,37 +500,17 @@ class LeakyReLuTransformer(torch.nn.Module):
         #python code/verifier.py --net fc_4 --spec test_cases/fc_4/img0_mnist_0.2096.txt --> not verified
         #python code/verifier.py --net fc_4 --spec test_cases/fc_4/img4_mnist_0.0554.txt --> verified
         
-        #python code/verifier.py --net conv_2 --spec test_cases/conv_2/img0_mnist_0.1872.txt --> not verified
-        #python code/verifier.py --net conv_2 --spec test_cases/conv_2/img2_mnist_0.1570.txt --> verified
-        
-        #python code/verifier.py --net conv_3 --spec test_cases/conv_3/img0_cifar10_0.0058.txt --> not verified
-        #python code/verifier.py --net conv_3 --spec test_cases/conv_3/img3_cifar10_0.0220.txt --> verified
-        
-        #python code/verifier.py --net conv_4 --spec test_cases/conv_4/img0_mnist_0.2724.txt --> not verified
-        #python code/verifier.py --net conv_4 --spec test_cases/conv_4/img2_mnist_0.1797.txt --> verified
-        
         #This shouldn't be detached because it comes from before in the network, not from a previous epoch
         prev_ub = upper_bounds.clone()
         prev_lb = lower_bounds.clone()
-
         logger.info(f'Leaky ReLU layer propagation... {self.layer}')
         logger.debug(f"Leaky ReLU input lower bounds first 50 values {prev_lb[:50]}, input upper bounds first 50 values {prev_ub[:50]}")
-
         logger.debug(f"Difference between upper and lower bounds {(prev_ub - prev_lb)[0:50]}")
-        
-
-
         
         zeros = torch.zeros(self.input_size)
         ones = torch.ones(self.input_size)
 
-        #Beta should be between alpha and 1
-        beta_bounded = None
-
-        
-
         #SET MASKS FOR THE DIFFERENT CASES
-
         #when lb >= 0
         mask_lower = prev_lb.ge(0)
 
@@ -643,10 +520,7 @@ class LeakyReLuTransformer(torch.nn.Module):
         #When lb < 0 and ub > 0
         mask_cross = ~ (mask_lower | mask_upper)
 
-
-
         #SET THE LOWER AND UPPER BOUNDS FOR THE DIFFERENT CASES
-
         #Exact case lb >= 0 -> xi <= xj <= xi
         self.lb = torch.where(mask_lower, prev_lb, self.lb.detach())
         self.ub = torch.where(mask_lower, prev_ub, self.ub.detach())
@@ -668,23 +542,19 @@ class LeakyReLuTransformer(torch.nn.Module):
                             lc_b = zeros,
                             mask= mask_upper)
         
-
-        #Convex Leaky relu
+        #Beta should be between alpha and 1
+        beta_bounded = None
+        
+        #Crossing and alpha < 1 -> Convex shape lower bounded by beta line
         if self.alpha < 1:
-            
             beta_bounded = torch.functional.F.sigmoid(self.beta) * (1 - self.alpha) + self.alpha
-
-
-            #Crossing and alpha < 1 -> Convex shape lower bounded by beta line
             # beta * xi <= xj <= lambda * xi + mu
             self.lb = torch.where(mask_cross, beta_bounded * prev_lb, self.lb.detach())
             self.ub = torch.where(mask_cross, prev_ub, self.ub.detach())
 
-
             #Here this should be fixed to used the prev_ub and prev_lb
             lambda_ = (prev_ub - self.alpha * prev_lb) / (prev_ub - prev_lb)
             mu_ = prev_ub - lambda_ * prev_ub
-            
            
             self.set_constraints(uc= lambda_,
                     uc_b = mu_,
@@ -692,15 +562,11 @@ class LeakyReLuTransformer(torch.nn.Module):
                     lc_b = zeros,
                     mask= mask_cross)
 
-        #SET THE CONSTRAINTS FOR THE DIFFERENT CASES AND SAVE THEM
-        
+        #SET THE CONSTRAINTS FOR THE DIFFERENT CASES AND SAVE THEM        
         #Exact case, this is linear transformer
         elif self.alpha == 1:
-
-
             self.ub = torch.where(mask_cross, prev_ub, self.ub.detach())
             self.lb = torch.where(mask_cross, prev_lb, self.lb.detach())
-
             self.set_constraints(
                 uc= ones,
                 uc_b = zeros,
@@ -708,22 +574,15 @@ class LeakyReLuTransformer(torch.nn.Module):
                 lc_b = zeros,
                 mask= mask_cross
             )
-
-            logger.debug(f"Leaky Relu Forward - alpha = 1 exact transformer")
-
-        
+            
+        #Crossing and alpha > 1 -> concave shape upper bounded by beta line
         elif self.alpha > 1:
-
             beta_bounded = torch.functional.F.sigmoid(self.beta) * (self.alpha - 1) + 1
-
-            #Crossing and alpha > 1 -> Convae shape upper bounded by beta line
 
             # lambda * xi + mu <= xj <= beta * xi
             self.lb = torch.where(mask_cross, self.alpha * prev_lb, self.lb.detach())
             self.ub = torch.where(mask_cross, beta_bounded * prev_ub, self.ub.detach())
-
-
-
+            
             #Compute the lower constraint
             lambda_ = (prev_ub - self.alpha * prev_lb) / (prev_ub - prev_lb)
 
@@ -735,40 +594,12 @@ class LeakyReLuTransformer(torch.nn.Module):
                                 lc = lambda_,
                                 lc_b = mu_,
                                 mask= mask_cross)
-
-
-
-        #Debugging - Find index of element that is has upperbound < lowerbound
-        mask_bug = self.ub < self.lb
-
+            
         #We then find which cases these belong to between mask_lower, mask_upper and mask_cross
         mask_lower = mask_bug & mask_lower
         mask_upper = mask_bug & mask_upper
         mask_cross = mask_bug & mask_cross
-
-        logger.debug(f"Any mask_lower element with upper bound < lower bound? {mask_lower.any()}")
-        logger.debug(f"Any mask_upper element with upper bound < lower bound? {mask_upper.any()}")
-        logger.debug(f"Any mask_cross element with upper bound < lower bound? {mask_cross.any()}")
-
-        #Find the number of entries that are true in mask_cross
-        logger.debug(f"Number of mask_cross elements with upper bound < lower bound? {mask_cross.sum()}")
-
-        #print the prev_ub and prev_lb values of the elements that are true in mask_cross
-
-        logger.debug(f"mask_lower[mask_bug] {mask_lower[mask_bug]}")
-        logger.debug(f"mask_upper[mask_bug] {mask_upper[mask_bug]}")
-        logger.debug(f"prev_lb[mask_bug] {prev_lb[mask_bug]}")
-        logger.debug(f"prev_ub[mask_bug] {prev_ub[mask_bug]}")
-        logger.debug(f"self.lb[mask_bug] {self.lb[mask_bug]}")
-        logger.debug(f"self.ub[mask_bug] {self.ub[mask_bug]}")
-
-        #print the constraints that are true in mask_cross
-        logger.debug(f"self.uc[mask_bug] {self.uc[mask_bug]}")
-        logger.debug(f"self.uc_b[mask_bug] {self.uc_b[mask_bug]}")
-        logger.debug(f"self.lc[mask_bug] {self.lc[mask_bug]}")
-        logger.debug(f"self.lc_b[mask_bug] {self.lc_b[mask_bug]}")
-
-    
+        
         return self.lb, self.ub
     
     def backwards(self, uc: torch.Tensor, uc_b: torch.Tensor,  lc: torch.Tensor, lc_b : torch.Tensor):
