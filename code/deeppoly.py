@@ -47,9 +47,6 @@ class DeepPoly:
         self.input_box_bounds_upper = None
         self.input_box_bounds_lower = None
         
-        #This saves the state of how many layers we have backsubstituted
-        self.backsub_order = 0
-       
        #Create the abstract network with the transformers of each layer
         prevl_input_size = input_size
         verifier_net = []
