@@ -80,7 +80,7 @@ class DeepPoly:
 
     def backsubstitute_from_layer(self, from_layer : int):
         """
-        uc, uc_b, lc, lc_b contain the upper and lower symbolic constraints for the layer from layer.
+        uc, uc_b, lc, lc_b contain the upper and lower symbolic constraints for the layer from_layer.
 
         They have one row / constraint per neuron in the layer from_layer. We are going to refine these constraints via backsubstitution
         to thenn compute more precise concrete bounds on the of from layer
@@ -90,7 +90,8 @@ class DeepPoly:
         uc_b = self.verifier_net[from_layer].uc_b
         lc = self.verifier_net[from_layer].lc
         lc_b = self.verifier_net[from_layer].lc_b
-        
+
+        #
         for i in range(from_layer - 1 , -1, -1):
             uc, uc_b, lc, lc_b = self.verifier_net[i].backwards(uc, uc_b, lc, lc_b)
 
@@ -105,7 +106,6 @@ class DeepPoly:
             - lower_bounds (n_batch, n_channels, height, width) or (n_channels, height, width) if there are no batches
             - upper_bounds (n_batch, n_channels, height, width) or (n_channels, height, width) if there are no batches
             
-
         Returns: 
         - The concrete bounds over the prediction neurons of the network
             - lower_bounds (n_batch, n_classes) or (n_classes) if there are no batches
@@ -117,15 +117,19 @@ class DeepPoly:
         self.input_box_bounds_upper = upper_bounds
         self.input_box_bounds_lower = lower_bounds
 
+        #Propagating updated bounds through network with backsub
         for i, layer in enumerate(self.verifier_net):
-
             logger.debug(f"Deeppoly verifier - Calling Forward pass layer {i} - {layer._get_name()}")
             if isinstance(layer, LinearTransformer):
                lower_bounds, upper_bounds = layer(lower_bounds, upper_bounds)
             if isinstance(layer, ConvTransformer):
                lower_bounds, upper_bounds = layer(lower_bounds, upper_bounds)
+
+            #In the case of Relu and LeakyRelu we always backsub before. 
+            #By obtaining tighter bounds it might show that we can 
+            #do exact bounds l,u <0 or 0<l,u and thus avoid approximation.
             if isinstance(layer, ReLuTransformer):
-               lower_bounds, upper_bounds = self.backsubstitute_from_layer(i-1)
+               lower_bounds, upper_bounds = self.backsubstitute_from_layer(i-1) #
                lower_bounds, upper_bounds = layer(lower_bounds, upper_bounds)
             if isinstance(layer, LeakyReLuTransformer):
                lower_bounds, upper_bounds = self.backsubstitute_from_layer(i-1)
@@ -144,6 +148,7 @@ class DeepPoly:
         for i, layer in enumerate(self.verifier_net):
             logger.debug(f"Concrete bounds for layer first 5 valus {i} - {layer} - lb: {layer.lb[:5]}, ub: {layer.ub[:5]}")
 
+        #For maximum precision we backsubstitute through the entire network.
         lower_bounds, upper_bounds = self.backsubstitute_from_layer(len(self.verifier_net) - 1)
         return lower_bounds, upper_bounds
     
@@ -208,9 +213,9 @@ class LinearTransformer(torch.nn.Module):
         """
         Applies the backsubstitution of the layer to the provided symbolic constraints.
 
-        It assumes that the input has been backsubstituted up to the next layer, in other words, 
-        the symbolic constraints are defined using the variables of the next layer and the concrete bounds
-        are computed using those of the current layer. 
+        It assumes that the Transformer has been backsubstituted up to the next layer (i), in other words, 
+        the symbolic constraints are defined using the variables of layer i and the concrete bounds
+        are computed by feeding the bounds of layer i - 1 in. 
 
         Args:
             - uc: symbolic upper bound constraints (n_constraints_last_layer, n_vars_current_layer)
