@@ -39,10 +39,6 @@ class DeepPoly:
         # There will always be n_classes == n_constraints and the number of variables will change each time we backsub
         self.net = net
         self.last = None
-        self.uc = None
-        self.uc_b = None
-        self.lc = None
-        self.lc_b = None
 
         self.input_box_bounds_upper = None
         self.input_box_bounds_lower = None
@@ -133,13 +129,6 @@ class DeepPoly:
                lower_bounds, upper_bounds = layer(lower_bounds, upper_bounds)
             assert (upper_bounds >= lower_bounds).all(), f"Upper bound is smaller than lower bound at layer {i+1}/{len(self.verifier_net)}: {layer}"
             
-        #We update the constraints of the last output to be those of the last layer
-        #This might happen after a gradient descent step hence we need to rerun the forward pass
-        self.uc = self.last.uc
-        self.uc_b = self.last.uc_b
-        self.lc = self.last.lc
-        self.lc_b = self.last.lc_b
-
         logger.debug(f"Forward pass done - Verifier net  : {self.verifier_net}")
         logger.debug(f"-------Concrete bounds state-----------")
         for i, layer in enumerate(self.verifier_net):
@@ -158,7 +147,6 @@ class LinearTransformer(torch.nn.Module):
         These are the constraints in shape (size_layer_out, size_layer_in)
         i.e alternatively n_constraints, n_vars
         """
-        # Pattern match in deeppoly function
         self.uc = layer.weight
         self.uc_b = layer.bias
         self.lc = layer.weight
@@ -170,20 +158,8 @@ class LinearTransformer(torch.nn.Module):
     def forward(self, lower_bounds : torch.Tensor, upper_bounds : torch.Tensor):
         #python code/verifier.py --net fc_base --spec test_cases/fc_base/img0_mnist_0.2456.txt --> not verified basic
         #python code/verifier.py --net fc_base --spec test_cases/fc_base/img2_mnist_0.0784.txt --> verified basic
-        '''
-        cu = torch.tensor([[1.0, 1.0], [0.0, 1.0]])
-        cu_b = torch.tensor([1.0, 0.0])
-        cl = torch.tensor([[1.0, 1.0], [0.0, 1.0]])
-        cl_b = torch.tensor([1.0, 0.0])
-        lb = torch.tensor([0.0, 0.0])
-        ub = torch.tensor([4.0, 2.0])
-        '''
+
         logger.info(f'Linear layer propagation... {self.layer}')
-        #logger.debug(f"linear layer weights shape: {self.layer.weight.shape}, bias shape: {self.layer.bias.shape}")
-        #logger.debug(f"linear_forward - cl_conc_in first 5 values {lower_bounds[:5]}")
-        #logger.debug(f"linear_forward - cu_conc_in first 5 values {upper_bounds[:5]}")
-        #logger.debug(f"linear_forward -  upper constraints shape : {self.uc.shape}, upper constraints bias : {self.uc_b.shape}, lower constraints shape : {self.lc.shape}, lower constraints bias : {self.lc_b.shape}")
-        #logger.debug(f"linear_forward -  lower bounds shape : {lower_bounds.shape}, upper bounds shape : {upper_bounds.shape}")
         self.lb = lower_bounds.clone()
         self.ub = upper_bounds.clone()
         self.ub, self.lb = concretize_bounds(self.uc, self.uc_b, self.lc, self.lc_b, self.lb, self.ub)
